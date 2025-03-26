@@ -1,0 +1,222 @@
+{
+  "name": "Demo workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "74003dcd-2ac7-4caa-a1cd-adecc5143c07",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1,
+      "position": [
+        480,
+        240
+      ],
+      "webhookId": "cdb5c076-d458-4b9d-8398-f43bd25059b1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are an AI assistant with access to tools.\n\nWhen you want to use a tool, respond with a JSON object in this format NO OTHER TEXT:\n          {\n            \"type\": \"tool_use\",\n            \"name\": \"<tool_name>\",\n            \"input\": {<tool_parameters>}\n          }\n\nIf you don't need to use a tool, respond normally: {{ $json.chatInput }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        732,
+        240
+      ],
+      "id": "939ef995-d1ee-42cb-823d-c64d09116f3a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "create",
+        "projectId": "pns55mna4wp4bij",
+        "table": "mcvlly3xyq6vh5q",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "title",
+              "fieldValue": "test"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        1140,
+        240
+      ],
+      "id": "12c10c80-b4cb-4866-b24a-1400213ec431",
+      "name": "NocoDB",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "YkPs1hgnagvpaanv",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Find the SEC filing for a given company and filing type for a particular month.\n\nbelow are description of the parameters:\n\nticker: str = Field(description=\"The ticker of the company to find for example 'AAPL', 'MSFT', 'AMZN', or 'META'\"),\n\nfiling_type: str = Field(description=\"The filing type to find for example '10-K' or '10-Q', hyphen may be omitted\"),\n\nmonth: str = Field(description=\"The month of the filing for example 'Jan 2023', a date may also be provided in which case only the month and year will be used\"),",
+        "connectionType": "sse",
+        "operation": "executeTool",
+        "toolName": "find_sec_filing",
+        "toolParameters": "{\n  \"ticker\": \"ticker\",\n  \"filing_type\": \"filing_type\",\n  \"month\": \"month\"\n}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        820,
+        460
+      ],
+      "id": "a158c074-121e-423d-bf01-08a9144c95fe",
+      "name": "find_sec_filing",
+      "credentials": {
+        "mcpClientSseApi": {
+          "id": "YSPeTkVbnTHss6VK",
+          "name": "MCP Client (SSE) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Analyze a specific SEC filing given it's document id and query it for information.\n\nbelow are description of the parameters:\n\ndoc_id: str = Field(description=\"The id of the document to analyze, IMPORTANT: this must be a UUID\"),\n\nquery: str = Field(description=\"The query to analyze for example 'What is the company's revenue?'\")",
+        "connectionType": "sse",
+        "operation": "executeTool",
+        "toolName": "find_sec_filing",
+        "toolParameters": "{\n  \"doc_id\": \"doc_id\",\n  \"query\": \"query\"\n}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        460
+      ],
+      "id": "13534374-5590-4b08-a24d-d048769d4dfa",
+      "name": "analyze_sec_filing",
+      "credentials": {
+        "mcpClientSseApi": {
+          "id": "YSPeTkVbnTHss6VK",
+          "name": "MCP Client (SSE) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        460
+      ],
+      "id": "abd53eb6-fef6-409e-a277-81b89970b338",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "kolpgEpzSbZUcWu4",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "connectionType": "sse"
+      },
+      "type": "n8n-nodes-mcp.mcpClient",
+      "typeVersion": 1,
+      "position": [
+        360,
+        440
+      ],
+      "id": "ead01dfa-a04e-4404-8d9a-19366820228d",
+      "name": "MCP Client",
+      "credentials": {
+        "mcpClientSseApi": {
+          "id": "YSPeTkVbnTHss6VK",
+          "name": "MCP Client (SSE) account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "NocoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "find_sec_filing": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyze_sec_filing": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c0659804-1058-4883-a093-50a5b46a6152",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "srOnR8PAY3u4RSwb",
+  "tags": []
+}
