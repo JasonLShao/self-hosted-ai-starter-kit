@@ -25,7 +25,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        692,
+        700,
         0
       ],
       "id": "939ef995-d1ee-42cb-823d-c64d09116f3a",
@@ -42,7 +42,7 @@
           "fieldValues": [
             {
               "fieldName": "title",
-              "fieldValue": "=AI: output: {{ $json.output }}"
+              "fieldValue": "=AI output: {{ $json.output }}"
             }
           ]
         }
@@ -258,7 +258,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "8090cab3-fd45-47ed-b7cf-a4dee3a99759",
+  "versionId": "8fdc6147-7d81-4532-9344-cb2537755376",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
